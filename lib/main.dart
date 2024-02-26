@@ -1,15 +1,24 @@
 import 'package:connectivity/connectivity.dart';
+import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
-import 'package:new_calculator/about_screen.dart';
-import 'package:new_calculator/account.dart';
-import 'package:new_calculator/calculator_screen.dart';
-import 'package:new_calculator/home_screen.dart';
-import 'package:new_calculator/settings.dart';
-import 'package:new_calculator/styles_data.dart';
-import 'package:new_calculator/theme_provider.dart';
+import 'package:new_calculator/components/auth_page.dart';
+import 'package:new_calculator/screens/about_screen.dart';
+import 'package:new_calculator/screens/calculator_screen.dart';
+import 'package:new_calculator/screens/contact_list.dart';
+import 'package:new_calculator/screens/gallery.dart';
+import 'package:new_calculator/screens/home_screen.dart';
+import 'package:new_calculator/screens/settings.dart';
+import 'package:new_calculator/components/styles_data.dart';
+import 'package:new_calculator/components/theme_provider.dart';
 import 'package:provider/provider.dart';
+import 'package:firebase_core/firebase_core.dart';
+import 'components/firebase_options.dart';
 
-void main() {
+Future<void> main() async {
+  WidgetsFlutterBinding.ensureInitialized();
+  await Firebase.initializeApp(
+    options: DefaultFirebaseOptions.currentPlatform,
+  );
   runApp(const MyApp());
 }
 
@@ -44,14 +53,13 @@ class _MyAppState extends State<MyApp> {
       providers: [
         ChangeNotifierProvider(create: (_) {
           return themeChangeProvider;
-          themeChangeProvider;
         })
       ],
       child: Consumer<ThemeProvider>(builder: (context, themeProvider, child) {
         return MaterialApp(
           title: 'Calculator',
           theme: Styles.themeData(themeProvider.getDarkTheme, context),
-          home: const MyHomePage(),
+          home: AuthPage(),
         );
       }),
     );
@@ -59,7 +67,8 @@ class _MyAppState extends State<MyApp> {
 }
 
 class MyHomePage extends StatefulWidget {
-  const MyHomePage({Key? key});
+  MyHomePage({Key? key});
+  final user = FirebaseAuth.instance.currentUser;
 
   @override
   State<MyHomePage> createState() => _MyHomePageState();
@@ -68,6 +77,10 @@ class MyHomePage extends StatefulWidget {
 class _MyHomePageState extends State<MyHomePage> {
   int _selectedIndex = 0;
   late ConnectivityResult _connectionStatus;
+
+  void signUserOut() {
+    FirebaseAuth.instance.signOut();
+  }
 
   @override
   void initState() {
@@ -103,7 +116,7 @@ class _MyHomePageState extends State<MyHomePage> {
   }
 
   final List<Widget> _widgetOptions = <Widget>[
-    const HomeScreen(),
+    HomeScreen(),
     const CalculatorScreen(),
     const AboutScreen(),
   ];
@@ -124,7 +137,7 @@ class _MyHomePageState extends State<MyHomePage> {
                 color: Colors.blueGrey,
               ),
               child: Text(
-                'Navigation Drawer',
+                'calculator 📱',
                 style: TextStyle(
                   color: Colors.white,
                   fontSize: 24,
@@ -141,12 +154,12 @@ class _MyHomePageState extends State<MyHomePage> {
               },
             ),
             ListTile(
-              title: const Text('Account'),
+              title: const Text('gallery'),
               onTap: () {
                 Navigator.pop(context);
                 Navigator.push(
                   context,
-                  MaterialPageRoute(builder: (context) => AccountPage()),
+                  MaterialPageRoute(builder: (context) => GalleryScreen()),
                 );
               },
             ),
@@ -160,12 +173,15 @@ class _MyHomePageState extends State<MyHomePage> {
               },
             ),
             ListTile(
-              title: const Text('About Us'),
+              title: const Text('Contact List'), // Add contact list tile
               onTap: () {
-                setState(() {
-                  _selectedIndex = 2;
-                  Navigator.pop(context);
-                });
+                Navigator.pop(context); // Close drawer
+                Navigator.push(
+                  context,
+                  MaterialPageRoute(
+                      builder: (context) =>
+                          ContactListScreen()), // Navigate to contact list screen
+                );
               },
             ),
             ListTile(
@@ -176,6 +192,12 @@ class _MyHomePageState extends State<MyHomePage> {
                   context,
                   MaterialPageRoute(builder: (context) => SettingsPage()),
                 );
+              },
+            ),
+            ListTile(
+              title: const Text('logout'),
+              onTap: () {
+                signUserOut();
               },
             ),
           ],

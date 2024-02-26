@@ -1,0 +1,29 @@
+{
+  "project_info": {
+    "project_number": "346034015437",
+    "project_id": "a-calculator-with-login",
+    "storage_bucket": "a-calculator-with-login.appspot.com"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:346034015437:android:539df10e644e38a2fe6d84",
+        "android_client_info": {
+          "package_name": "com.example.new_calculator"
+        }
+      },
+      "oauth_client": [],
+      "api_key": [
+        {
+          "current_key": "AIzaSyChzJ26lXGCyTQpJEbKd9PgImi5N7-I5qA"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": []
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}
